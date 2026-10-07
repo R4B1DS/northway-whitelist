@@ -1,6 +1,8 @@
 # NorthWay Whitelist System
 
-OAuth2-based whitelist application system for the **NorthWay** GTA RP server.
+OAuth2-based whitelist application system for the **NorthWay** GTA RP server —
+originally planned under the name **NoWay RP** before the project's rebrand.
+
 Users authenticate with Discord, submit an application form, and moderators
 review it through a web panel. Approved applicants automatically receive the
 whitelisted role on Discord.
@@ -56,10 +58,14 @@ a single panel.
 server/         Express app, routes, OAuth2 strategy
 views/          EJS templates
 public/         Static assets (logo, banner, CSS)
-config.json     Guild, roles, database, server status config
-.env            Discord credentials and secrets
+config.json     Application settings (guild, roles, database, status)
+.env            Credentials and secrets — not committed
 sqlsite.sql     Database schema and seed data
 ```
+
+> **Note:** `config.json` and `.env` hold credentials and identifiers. Both are
+> provided as templates only. Real values are never committed to this
+> repository. See the **Configuration** section below.
 
 ## Database Schema
 
@@ -88,44 +94,18 @@ npm install
 
 **3. Configure environment**
 
-Copy `env.txt` to `.env` and fill in:
+Create a `.env` file at the root (a template is provided as `env.txt`) and
+fill in the required values from the [Discord Developer Portal](https://discord.com/developers/applications).
 
-```env
-CLIENT_ID=""
-CLIENT_SECRET=""
-TOKEN=""
-CLIENT_REDIRECT="http://localhost:5000/auth/callback"
-PORT=""
-```
+The application reads all credentials and connection strings from environment
+variables and from `config.json`. Refer to the template files for the exact
+field names and structure.
 
-Get the Discord credentials from the [Discord Developer Portal](https://discord.com/developers/applications).
+> 🔒 **Security:** Never commit `.env` or a filled-in `config.json`. Both are
+> listed in `.gitignore`. If credentials are ever leaked, rotate them
+> immediately in the Discord Developer Portal and your database.
 
-**4. Configure the application**
-
-Edit `config.json`:
-
-```json
-{
-  "mainGuild": "GUILD_ID",
-  "db": {
-    "host": "localhost",
-    "name": "sitewl",
-    "user": "root",
-    "pass": "",
-    "dialect": "mysql"
-  },
-  "rolesCfg": {
-    "roleOwner": "OWNER_ROLE_ID",
-    "roleAprovador": "APPROVER_ROLE_ID"
-  },
-  "status": {
-    "ip": "SERVER_IP",
-    "porta": "SERVER_PORT"
-  }
-}
-```
-
-**5. Import the database**
+**4. Import the database**
 
 Import `sqlsite.sql` into your MySQL instance:
 
@@ -133,20 +113,32 @@ Import `sqlsite.sql` into your MySQL instance:
 mysql -u root -p < sqlsite.sql
 ```
 
-**6. Run**
+**5. Run**
 
 ```bash
 npm start
 ```
 
-Open `http://localhost:5000` and log in with Discord.
+Open the local address printed in the terminal and log in with Discord.
+
+## Configuration
+
+The application is configured through two files, both of which are **not**
+tracked in version control:
+
+- `.env` — environment variables (authentication credentials, session secret, port)
+- `config.json` — application settings (guild, roles, database connection, server status)
+
+Template versions are provided in the repository so new installations can
+copy them and fill in their own values. Refer to those templates for field
+names and structure.
 
 ## Security Notes
 
 - Discord OAuth2 — no passwords stored in the database
 - Server-side session management via `express-session`
 - Role-based access control for the moderator panel
-- `.env` is gitignored — never commit real credentials
+- All credentials and identifiers live outside version control
 - Input validation on application submission
 
 > ⚠️ **Note:** This codebase is from 2022. The `discord.js` v12 dependency is
@@ -171,7 +163,7 @@ MIT — free to use, modify, and redistribute.
 
 <div align="center">
 
-Originally built for the **NorthWay** GTA RP community.
+Originally built for the **NorthWay** GTA RP community (formerly planned as **NoWay RP**).
 
 <sub>README structure and wording refined with AI assistance. Code and architecture are original work from 2022.</sub>
 
